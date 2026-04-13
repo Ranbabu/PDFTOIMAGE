@@ -5,6 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>PDF to Slides PRO</title>
 
+<link rel="manifest" href="manifest.json">
+<meta name="theme-color" content="#0b1120">
+<link rel="apple-touch-icon" href="icon-192.png">
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 
@@ -32,7 +36,6 @@
     overflow: hidden; 
   }
 
-  /* 📱 Header Style */
   header {
     background: #0b1120;
     padding: 15px;
@@ -44,7 +47,6 @@
     z-index: 10;
   }
 
-  /* 📜 Main Scrollable Content */
   main {
     flex: 1;
     overflow-y: auto;
@@ -52,7 +54,6 @@
     padding-bottom: 80px; 
   }
 
-  /* 🎛️ Controls Section */
   .controls {
     display: flex;
     flex-direction: column;
@@ -121,7 +122,6 @@
     color: #94a3b8;
   }
 
-  /* 🖼️ Slides Grid */
   .slides {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
@@ -173,7 +173,6 @@
     transition: background 0.3s;
   }
 
-  /* 🦶 Footer Style */
   footer {
     background: #0b1120;
     padding: 10px;
@@ -332,7 +331,6 @@ function createSlideCard(imgData, num, container) {
   container.appendChild(box);
 }
 
-// सिंगल इमेज डाउनलोड करने के लिए
 function downloadSingleImage(dataUrl, num) {
   const a = document.createElement("a");
   a.href = dataUrl;
@@ -342,7 +340,6 @@ function downloadSingleImage(dataUrl, num) {
   document.body.removeChild(a);
 }
 
-// 🚀 नया फंक्शन: ज़िप फोल्डर डाउनलोड करने के लिए
 async function downloadAllZip() {
   if (slides.length === 0) {
     alert("Please load a PDF first!");
@@ -355,20 +352,15 @@ async function downloadAllZip() {
 
   try {
     const zip = new JSZip();
-    // ज़िप के अंदर एक फोल्डर बना रहे हैं
     const imgFolder = zip.folder("PDF_Slides"); 
 
-    // सारी इमेजेज को फोल्डर में डाल रहे हैं
     slides.forEach((slide) => {
-      // Base64 स्ट्रिंग से हेडर हटाना ज़रूरी है
       const base64Data = slide.data.split(',')[1];
       imgFolder.file(`Slide_${slide.num}.png`, base64Data, {base64: true});
     });
 
-    // ज़िप फाइल जनरेट करना
     const content = await zip.generateAsync({type: "blob"});
     
-    // डाउनलोड ट्रिगर करना
     const a = document.createElement("a");
     a.href = URL.createObjectURL(content);
     a.download = "PDF_Slides_PRO.zip";
@@ -388,6 +380,19 @@ async function downloadAllZip() {
     btn.innerText = "📥 Download Folder (ZIP)";
     btn.disabled = false;
   }
+}
+
+// PWA Service Worker Registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('./sw.js')
+      .then(registration => {
+        console.log('ServiceWorker registration successful');
+      })
+      .catch(error => {
+        console.log('ServiceWorker registration failed: ', error);
+      });
+  });
 }
 </script>
 
